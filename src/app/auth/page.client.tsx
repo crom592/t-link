@@ -20,8 +20,8 @@ export default function AuthPage() {
     return (
       <div>
         <h1 className="text-2xl mb-4">Login or Sign Up</h1>
-        <button className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-700" onClick={handleGoogleLogin} >Sign in with Google</button>
-        <button className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-700" onClick={handleFacebookLogin}>Sign in with Facebook</button>
+        <button className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-700"  >Sign in with Google</button>
+        <button className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-700" >Sign in with Facebook</button>
       </div>
     );
   }

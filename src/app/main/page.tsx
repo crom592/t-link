@@ -2,11 +2,27 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import data from '../mockData.json';  // JSON 파일의 경로를 수정해주세요.
+type Post = {
+  id: number;
+  type: string;
+  title: string;
+  location: string;
+  date: string;
+  language: string;
+  description: string;
+  image: string;
+  mapInfo: {
+    latitude: number;
+    longitude: number;
+    zoom: number;
+  };
+};
 
 export default function MainPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(Math.ceil(data.length / 5));
-  const [visiblePosts, setVisiblePosts] = useState([]);
+  const [visiblePosts, setVisiblePosts] = useState<Post[]>([]);
+
 
   useEffect(() => {
     const startIdx = (currentPage - 1) * 5;
