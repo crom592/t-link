@@ -17,24 +17,6 @@ export default function AuthPage() {
       });
     }, []);
     // Initialize Facebook SDK
-    const handleGoogleLogin = () => {
-      const auth2 = gapi.auth2.getAuthInstance();
-      auth2.signIn().then(googleUser => {
-        // Get ID token to send to the server
-        const id_token = googleUser.getAuthResponse().id_token;
-        // Send ID token to server
-      });
-    };
-    const handleFacebookLogin = () => {
-        FB.login(response => {
-          if (response.authResponse) {
-            // Get access token to send to the server
-            const accessToken = response.authResponse.accessToken;
-            // Send access token to server
-          }
-        });
-      };
-    
     return (
       <div>
         <h1 className="text-2xl mb-4">Login or Sign Up</h1>
