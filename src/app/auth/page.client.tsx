@@ -1,6 +1,5 @@
 // app/auth/login/page.tsx
 import { useEffect } from 'react';
-import FB from 'fbjs';
 // Declare type for 'gapi'
 declare const gapi: any;
 declare global {
@@ -18,15 +17,6 @@ export default function AuthPage() {
       });
     }, []);
     // Initialize Facebook SDK
-    useEffect(() => {
-        window.fbAsyncInit = function() {
-        FB.init({
-            appId      : 'YOUR_FACEBOOK_APP_ID',
-            cookie     : true,
-            version    : 'v8.0'
-        });
-        };
-    }, []);
     const handleGoogleLogin = () => {
       const auth2 = gapi.auth2.getAuthInstance();
       auth2.signIn().then(googleUser => {
