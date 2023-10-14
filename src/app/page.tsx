@@ -3,14 +3,24 @@ import Link from 'next/link'
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+    <main className="flex min-h-[calc(100vh-64px)] flex-col items-start justify-center p-24 bg-cover" style={{backgroundImage: 'url(/sky.avif)'}}>
       <Link href="/main">
-      <h1 className="text-6xl font-bold">
-      Welcome to T-LINK.
-      </h1>
-        <Image src="/sky.avif" alt="t-link" width={500} height={500}/> 
+        <div className="flex flex-col items-start justify-center mb-4">
+          <h1 className="text-7xl font-bold text-white mb-4">
+            <p>
+              Welcome to T-LINK
+            </p>
+            <p>
+              당신을 사용하실 그 분을 위하여
+            </p>
+          </h1>
+        </div>
       </Link>
-
+      <Link href="/about">
+        <button className="text-2xl font-semibold border-2 border-white px-4 py-2 hover:bg-white hover:text-black transition-colors">
+          About
+        </button>
+      </Link>
     </main>
   );
 }
