@@ -32,7 +32,7 @@ export default function MainPage() {
 
   return (
     <main className="container mx-auto flex flex-col justify-center items-center min-h-screen p-8 bg-white w-full">
-      <h1 className="text-9xl font-bold mb-4">LINKS</h1>      
+      <h1 className="text-7xl font-bold mb-4">LINKS</h1>      
       <div className="grid grid-cols-1 gap-4 w-full md:w-3/4 lg:grid-cols-2 lg:gap-8">
         {visiblePosts.map((post) => (
           <div key={post.id} className="border rounded-lg p-4 hover:bg-gray-100 flex justify-between">
