@@ -19,6 +19,6 @@
 body {
   @apply bg-cover bg-no-repeat bg-center relative;
   color: rgb(var(--foreground-rgb));
-  background-image: url('../../public/sky.avif'); /* 이 경로를 원하는 이미지 경로로 변경해주세요. */
-  background-color: rgb(var(--background-start-rgb)); /* 배경색을 원하는대로 설정하세요. */
+  background-image: url('/public/sky.avif'); /* 경로 수정 */
+  background-color: rgb(var(--background-start-rgb));
 }

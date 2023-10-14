@@ -6,7 +6,7 @@ export default function Home() {
     <main className="flex min-h-[calc(100vh-64px)] flex-col items-start justify-center p-24 bg-cover" style={{backgroundImage: 'url(/sky.avif)'}}>
       <Link href="/main">
         <div className="flex flex-col items-start justify-center mb-4">
-          <h1 className="text-5xl font-bold text-white mb-4">
+          <h1 className="text-3xl font-bold text-white mb-4">
             <p>
               Welcome to T-LINK
             </p>
