@@ -17,21 +17,23 @@ type Post = {
     longitude: number;
     zoom: number;
   };
+  requestType: "missionaryRequest" | "shortTermRequest";
 };
+const postData: Post[] = (data as unknown) as Post[];
 
 export default function MainPage() {
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(Math.ceil(data.length / 5));
+  const [totalPages, setTotalPages] = useState(Math.ceil(postData.length / 5));
   const [visiblePosts, setVisiblePosts] = useState<Post[]>([]);
   const [requestType, setRequestType] = useState<"missionaryRequest" | "shortTermRequest">("missionaryRequest");
   const [searchTerm, setSearchTerm] = useState(''); // 검색어를 저장하는 state
 
   // 검색어에 따른 필터링을 처리하는 useEffect
   useEffect(() => {
-    let filteredPosts = data.filter(post => post.requestType === requestType);
+    let filteredPosts = postData.filter((post): post is Post => 'id' in post && typeof post.id === 'number' && 'title' in post && typeof post.title === 'string');
     
     if (searchTerm) {
-      filteredPosts = filteredPosts.filter(post => post.title.includes(searchTerm));
+      filteredPosts = filteredPosts.filter(post => post.title && post.title.includes(searchTerm));
     }
     
     setTotalPages(Math.ceil(filteredPosts.length / 5));
@@ -41,7 +43,7 @@ export default function MainPage() {
   }, [currentPage, requestType, searchTerm]);
 
 useEffect(() => {
-  const filteredPosts = data.filter(post => post.requestType === requestType);
+  const filteredPosts = postData.filter((post): post is Post => post.requestType === requestType);
   setTotalPages(Math.ceil(filteredPosts.length / 5));
   const startIdx = (currentPage - 1) * 5;
   const endIdx = startIdx + 5;
@@ -51,7 +53,7 @@ useEffect(() => {
   useEffect(() => {
     const startIdx = (currentPage - 1) * 5;
     const endIdx = startIdx + 5;
-    setVisiblePosts(data.slice(startIdx, endIdx));
+    setVisiblePosts(postData.slice(startIdx, endIdx));
   }, [currentPage]);
 
   return (

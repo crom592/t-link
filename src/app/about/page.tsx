@@ -2,9 +2,13 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
+type FeatureListProps = {
+  title: string;
+  features: string[];
+};
 
 // 분리된 컴포넌트
-function FeatureList({ title, features }) {
+function FeatureList({ title, features }: FeatureListProps) {
   return (
     <div className="mb-10">
       <h2 className="text-4xl mt-6 mb-6 font-semibold">{title}</h2>

@@ -30,7 +30,7 @@ export default function DetailPage({ params }: { params: { id: string } }) {
           scrolling="no" 
           marginHeight={0}
           marginWidth={0}
-          src={`https://maps.google.com/maps?q=${post.mapInfo.latitude},${post.mapInfo.longitude}&z=${post.mapInfo.zoom}&output=embed`}
+          src={`https://maps.google.com/maps?q=${post.mapInfo?.latitude},${post.mapInfo?.longitude}&z=${post.mapInfo?.zoom}&output=embed`}
           title={`Map of ${post.location}`}>
         </iframe>
       </div>
