@@ -19,6 +19,6 @@
 body {
   @apply bg-cover bg-no-repeat bg-center relative;
   color: rgb(var(--foreground-rgb));
-  background-image: url('/public/sky.avif'); /* 경로 수정 */
+  background-image: url('/sky.avif'); /* 경로 수정 */
   background-color: rgb(var(--background-start-rgb));
 }

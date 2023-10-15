@@ -28,7 +28,8 @@ export default function CreatePage() {
   };
   
   const handleAsyncSubmit = async () => {
-    const res = await fetch('/app/api/addToMockData', {
+    console.log(JSON.stringify(formData));
+    const res = await fetch('/api/addToMockData', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
