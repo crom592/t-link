@@ -1,3 +1,4 @@
+//app/layout.tsx
 import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
@@ -13,9 +14,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+
       <body className={`${inter.className} relative`}> 
-      <div className="relative min-h-screen font-inter">
-      <nav className="absolute top-0 left-0 w-full bg-opacity-50 p-4 text-center text-black z-10">
+      <div className="relative min-h-screen font-inter bg-none">
+      <nav className="absolute top-0 left-0 w-full bg-opacity-50 p-4 text-center text-white z-10">
           <Link className="mx-2 font-semibold no-underline" href="/">
             Home
           </Link>

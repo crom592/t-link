@@ -20,8 +20,10 @@
     ],
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "typeRoots": ["./node_modules/@types", "./types","../node_modules/@types","../@types"],
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "public/util/mockDataFunctions.js"],
+  "types": ["bun-types"],
+  "include": ["./types/*.d.ts", "./src/**/*","next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "public/util/mockDataFunctions.js", "src/app/main/[id]/Map.server.js"],
   "exclude": ["node_modules"]
 }

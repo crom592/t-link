@@ -1,18 +1,18 @@
+//app/page.tsx
 import Image from 'next/image'
 import Link from 'next/link'
 
 export default function Home() {
   return (
-    <main className="flex min-h-[calc(100vh-64px)] flex-col items-start justify-center p-24 bg-cover" style={{backgroundImage: 'url(/sky.avif)'}}>
+    // <main className="flex min-h-[calc(100vh-64px)] flex-col items-start justify-center p-24 bg-cover" style={{backgroundImage: 'url(/images/sky.avif)'}}>
+    <main className="flex min-h-[calc(100vh-64px)] flex-col items-start justify-center p-24 bg-cover">
       <Link href="/main">
         <div className="flex flex-col items-start justify-center mb-4">
           <h1 className="text-3xl font-bold text-white mb-4">
             <p>
               Welcome to T-LINK
             </p>
-            <p>
-              당신을 사용하실 그 분을 위하여
-            </p>
+            <p>For the One Who Will Use You</p>
           </h1>
         </div>
       </Link>

@@ -22,7 +22,7 @@ t-link                            //
 │  │  │  └─ page.tsx              //
 │  │  ├─ api                      //
 │  │  │  └─ addToMockData         //
-│  │  │     └─ route.js           //
+│  │  │     └─ route.ts           //
 │  │  ├─ auth                     //
 │  │  │  ├─ [... nextauth].js     //
 │  │  │  └─ page.client.tsx       //
