@@ -22,6 +22,7 @@ import {
 import "react-country-state-city/dist/react-country-state-city.css";
 import Script from "next/script";
 import Image from 'next/image';
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 type Task = {
   id: number;
   name: string;
@@ -29,10 +30,10 @@ type Task = {
 };
 const useFetchTasks = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
-  
+  process.env.NEXT_PUBLIC_API_URL
   useEffect(() => {
     const fetchTasks = async () => {
-      const res = await fetch("http://127.0.0.1:8000/api-task/", {
+      const res = await fetch(apiUrl+"/api-task/", {
         headers: {
           accept: "application/json",
         },
@@ -234,7 +235,7 @@ export default function CreatePage() {
     }
   
     console.log(JSON.stringify(formData));
-    const res = await fetch("http://127.0.0.1:8000/api-job/posting/", {
+    const res = await fetch(apiUrl+"/api-job/posting/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

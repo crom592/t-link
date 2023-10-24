@@ -9,7 +9,7 @@ const nextConfig = {
           // 클라이언트에서 이 URL로 요청을 보냅니다.
           source: '/api-:path*',
           // 실제 요청이 전달될 서버의 URL입니다.
-          destination: 'http://127.0.0.1:8000/api-:path*',
+          destination: process.env.NEXT_PUBLIC_API_URL+'/api-:path*',
         },
       ];
     },
