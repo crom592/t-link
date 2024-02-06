@@ -24,55 +24,106 @@ export default function MainPage() {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const [postData, setPostData] = useState<Post[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(Math.ceil(postData.length / 6));
+  const [countPerPage, setCountPerPage] = useState(6);  // <-- 여기에 countPerPage를 선언하고 초기값을 설정
+  const [totalPages, setTotalPages] = useState(Math.ceil(postData.length / countPerPage));
+  const [totalItems, setTotalItems] = useState(0);
   const [visiblePosts, setVisiblePosts] = useState<Post[]>([]);
   // const [requestType, setRequestType] = useState<"missionaryRequest" | "shortTermRequest">("missionaryRequest");
   // 초기 requestType을 null로 설정합니다.
   const [requestType, setRequestType] = useState<"missionaryRequest" | "shortTermRequest" | null>(null);
   const [searchTerm, setSearchTerm] = useState(''); // 검색어를 저장하는 state
-  useEffect(() => {
-    fetch(`${apiUrl}/api-job/posting/`)
+  const fetchPosts = () => {
+    const startTime = performance.now();  // Start time
+  
+    console.log(`Fetching data for page: ${currentPage}`);
+  
+    // 검색어가 있다면 API URL에 추가
+    const searchQuery = searchTerm ? `&search=${searchTerm}` : '';
+  
+    fetch(`${apiUrl}/api-job/posting/?count_per_page=${countPerPage}&order_by=id&page=${currentPage}${searchQuery}`)
       .then(response => response.json())
       .then(data => {
-        const transformedData = data.map((item: any) => ({
-          ...item,
-          requestType: item.type.includes("01") ? "missionaryRequest" : "shortTermRequest"
-        }));
-        setPostData(transformedData as Post[]);
-        console.log("Fetched and transformed data: ", transformedData);
+        const endTime = performance.now();  // End time
+        const timeTaken = endTime - startTime;  // Time taken in milliseconds
+  
+        console.log(`Time taken for fetch: ${timeTaken} ms`);
+  
+        setPostData(data.items);
+        setTotalPages(data.total_page);
+        setTotalItems(data.total);
+      })
+      .catch(error => {
+        console.error("Failed to fetch data: ", error);
+      });
+  };
+  
+  
+  useEffect(() => {
+    const startTime = performance.now();  // Start time
+  
+    console.log(`Fetching data for page: ${currentPage}`);
+    
+    fetch(`${apiUrl}/api-job/posting/?count_per_page=${countPerPage}&order_by=id&page=${currentPage}`)
+      .then(response => response.json())
+      .then(data => {
+        const endTime = performance.now();  // End time
+        const timeTaken = endTime - startTime;  // Time taken in milliseconds
+        
+        console.log(`Time taken for fetch: ${timeTaken} ms`);
+  
+        // ... rest of your code
+        setPostData(data.items);
+        setTotalPages(data.total_page);
+        setTotalItems(data.total);
       }).catch(error => {
         console.error("Failed to fetch data: ", error);
       });
-  }, []);
+  }, [currentPage, countPerPage]);
+  
+
   
   
   
-  useEffect(() => {
+    useEffect(() => {
+      // 상태 변수의 현재 값을 출력
+      console.log('Current State:', {
+        postData,
+        currentPage,
+        requestType,
+        searchTerm,
+        countPerPage,
+        totalPages
+      });
     let filteredPosts = postData;
-  
-      // 만약 requestType이 설정되어 있다면 필터링을 적용합니다.
-      if (requestType) {
-        filteredPosts = postData.filter(post => post.requestType === requestType);
-      }
-      
-  
+
+    // 만약 requestType이 설정되어 있다면 필터링을 적용합니다.
+    if (requestType) {
+      filteredPosts = postData.filter(post => post.requestType === requestType);
+    }
+
     // Apply search term filter
     if (searchTerm) {
       filteredPosts = filteredPosts.filter(post => post.title.includes(searchTerm));
     }
-  
+
     // Update total pages
-    const newTotalPages = Math.ceil(filteredPosts.length / 6);
-    if (newTotalPages !== totalPages) {
-      setTotalPages(newTotalPages);
-    }
-  
+    // const newTotalPages = Math.ceil(filteredPosts.length / countPerPage); // 수정된 부분
+    // if (newTotalPages !== totalPages) {
+    //   setTotalPages(newTotalPages);
+    // }
+
     // Handle pagination
-    const startIdx = (currentPage - 1) * 6;
-    const endIdx = startIdx + 6;
-    setVisiblePosts(filteredPosts.slice(startIdx, endIdx));
+    const startIdx = (currentPage - 1) * countPerPage; // 수정된 부분
+    const endIdx = startIdx + countPerPage; // 수정된 부분
+    setVisiblePosts(postData);
+    console.log("startIdx : " + startIdx);
+    console.log("endIdx : " + endIdx);
+    // 필터링과 페이지네이션을 적용한 후의 포스트 배열을 출력
+    console.log('Filtered and Paginated Posts:', filteredPosts.slice(startIdx, endIdx));
+
+  }, [postData]);
   
-  }, [postData, currentPage, requestType, searchTerm]);
+
   
 
 
@@ -91,7 +142,16 @@ return (
             placeholder="Search..." 
             className="border p-2 rounded mr-2" 
           />
-          <button className="text-xl font-semibold border-2 border-white px-4 py-2 mr-3 hover:bg-white hover:text-black transition-colors" onClick={() => setCurrentPage(1)}>Search</button>
+          {/* <button className="text-xl font-semibold border-2 border-white px-4 py-2 mr-3 hover:bg-white hover:text-black transition-colors" onClick={() => setCurrentPage(1)}>Search</button> */}
+          <button 
+            className="text-xl font-semibold border-2 border-white px-4 py-2 mr-3 hover:bg-white hover:text-black transition-colors" 
+            onClick={() => {
+              setCurrentPage(1);  // 페이지를 1로 초기화
+              fetchPosts();  // API 호출 함수
+            }}
+          >
+            Search
+          </button>
           <select onChange={e => setRequestType(e.target.value as any)} className="border p-2 rounded mr-2">
           <option value={undefined}>All</option>
           <option value="missionaryRequest">선교지</option>
