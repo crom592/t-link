@@ -2,7 +2,7 @@
     "rewrites": [
       {
         "source": "/api/:path*",
-        "destination": "http://3.27.209.97:8000/api-:path*"
+        "destination": "https://missionlink.vercel.app/api-:path*"
       }
     ]
   }
