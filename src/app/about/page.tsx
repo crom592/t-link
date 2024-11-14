@@ -14,56 +14,70 @@ export default function About() {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center min-h-screen p-8 bg-slate-400 bg-cover bg-no-repeat text-white">
-      <div className="text-center max-w-xl">
-        <h1 className="text-5xl mb-8 font-semibold mt-12">About T-LINK</h1>
-        <p className="text-xl mb-6">
-          {/* T-LINK는 지역 선교사님과 단기선교사들을 매칭하기 위한 플랫폼입니다. */}
-          T-LINK is a platform for matching local missionaries with short-term missionaries.
-        </p>
-         {/* Center the image */}
-         <div className="flex justify-center items-center">
-        <Image
-          src="/images/t-link-about.png" // 이미지 경로
-          alt="About Image"
-          width={500}
-          height={500}
-        />
+    <div className="min-h-screen py-16 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center">
+          <h1 className="text-5xl font-bold mb-8 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 bg-clip-text text-transparent">
+            About T-LINK
+          </h1>
+          <p className="text-xl mb-12 text-white/80">
+            T-LINK is a platform for matching local missionaries with short-term missionaries.
+          </p>
         </div>
-        <FeatureList
-          // title="기능 소개"
-          title="Features"
-          features={[
-            // '단체가입, 개인 가입 가능 (SNS 로그인 포함)',
-            // '선교지 매칭'
-            'Organizations and individuals can sign up (including social media logins) Mission Matching'
-            // ...기타 기능들
-          ]}
-        />
-         <div className="flex justify-center items-center">
-         <Image
-          src="/images/Links.png" // 이미지 경로
-          alt="Links"
-          width={500}
-          height={500}
-        />
+
+        <div className="mb-16">
+          <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+            <div className="absolute inset-0 bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-indigo-500/10"></div>
+            <Image
+              src="/images/t-link-about.png"
+              alt="About Image"
+              width={800}
+              height={400}
+              className="w-full h-auto object-cover transform hover:scale-105 transition-transform duration-500"
+            />
+          </div>
         </div>
-        <button
-          className="mt-6 mb-6 text-xl bg-blue-600 text-white py-2 px-4 rounded"
-          onClick={handleToggle}
-        >
-          {showFutureFeatures ? 'Hide Future Features' : 'Show Future Features'}
-        </button>
+
+        <div className="mb-16">
+          <FeatureList
+            title="Features"
+            features={[
+              'Organizations and individuals can sign up (including social media logins)',
+              'Mission field matching system',
+              'Real-time communication',
+              'Resource sharing platform'
+            ]}
+          />
+        </div>
+
+        <div className="mb-16">
+          <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+            <div className="absolute inset-0 bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-indigo-500/10"></div>
+            <Image
+              src="/images/Links.png"
+              alt="Links"
+              width={800}
+              height={400}
+              className="w-full h-auto object-cover transform hover:scale-105 transition-transform duration-500"
+            />
+          </div>
+        </div>
+
+        <div className="text-center">
+          <button
+            onClick={handleToggle}
+            className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:from-pink-400 hover:via-purple-400 hover:to-indigo-400 text-white px-8 py-3 rounded-lg text-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl"
+          >
+            {showFutureFeatures ? 'Hide Future Features' : 'Show Future Features'}
+          </button>
+        </div>
+
         {showFutureFeatures && (
           <FeatureList
-            // title="추후 공개 기능"
             title="Coming Soon"
             features={[
-              // '단기 선교 프로그램 소개 페이지 제공',
-              // '커뮤니티 및 블로그 기능 제공',
               'Provide an About page for your short-term mission program',
               'Provide community and blogging features'
-              // ...기타 기능들
             ]}
           />
         )}
