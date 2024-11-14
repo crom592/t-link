@@ -350,154 +350,293 @@ export default function CreatePage() {
   
 
   return (
-    <main className="container mx-auto flex flex-col justify-center items-center min-h-screen p-8 bg-slate-300 w-full">
-      <h1 className="text-3xl font-bold text-white mb-4 mt-8">Write Demand</h1>
+    <main className="container mx-auto px-4 py-8 bg-gradient-to-b from-slate-100 to-slate-200 min-h-screen">
+      <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-xl p-6">
+        <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
+          선교지 등록하기
+        </h1>
 
-      <form className="w-full md:w-3/4" onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="title"
-          value={formData.title}
-          onChange={handleChange}
-          placeholder="Title"
-          className="border p-2 rounded mb-4 w-full"
-        />
-        <select
-          name="type"
-          value={formData.type}
-          onChange={handleChange}
-          className="border p-2 rounded mb-4 w-full"
-        >
-          <option value="01">선교사 요청</option>
-          <option value="02">단기 선교사 요청</option>
-        </select>
-        <div className="flex space-x-4 mb-4">
-          <div className="w-1/2">
-            <label className="block text-gray-700 mb-2">START DATE</label>
-            <DatePicker
-              name="start_date"
-              selected={new Date(formData.start_date)}
-              onChange={(date: Date) => {
-                setFormData({
-                  ...formData,
-                  start_date: format(date, "yyyy-MM-dd"),
-                });
-              }}
-              dateFormat="yyyy-MM-dd"
-              className="border p-2 rounded w-full"
-            />
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* 기본 정보 섹션 */}
+          <section className="space-y-4">
+            <h2 className="text-xl font-semibold text-gray-700 border-b pb-2">기본 정보</h2>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  제목 <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  placeholder="선교지 제목을 입력해주세요"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  선교사 유형 <span className="text-red-500">*</span>
+                </label>
+                <select
+                  name="type"
+                  value={formData.type}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                >
+                  <option value="">선택해주세요</option>
+                  <option value="01">선교사 요청</option>
+                  <option value="02">단기 선교사 요청</option>
+                </select>
+              </div>
+            </div>
+          </section>
+
+          {/* 기간 섹션 */}
+          <section className="space-y-4">
+            <h2 className="text-xl font-semibold text-gray-700 border-b pb-2">선교 기간</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  시작일 <span className="text-red-500">*</span>
+                </label>
+                <DatePicker
+                  name="start_date"
+                  selected={new Date(formData.start_date)}
+                  onChange={(date: Date) => {
+                    setFormData({
+                      ...formData,
+                      start_date: format(date, "yyyy-MM-dd"),
+                    });
+                  }}
+                  dateFormat="yyyy-MM-dd"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  종료일 <span className="text-red-500">*</span>
+                </label>
+                <DatePicker
+                  name="end_date"
+                  selected={new Date(formData.end_date)}
+                  onChange={(date: Date) => {
+                    setFormData({
+                      ...formData,
+                      end_date: format(date, "yyyy-MM-dd"),
+                    });
+                  }}
+                  dateFormat="yyyy-MM-dd"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* 위치 정보 섹션 */}
+          <section className="space-y-4">
+            <h2 className="text-xl font-semibold text-gray-700 border-b pb-2">위치 정보</h2>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  국가 <span className="text-red-500">*</span>
+                </label>
+                <CountrySelect
+                  containerClassName="form-group"
+                  inputClassName="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  onChange={handleCountryChange}
+                  placeHolder="국가를 선택해주세요"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  주/도
+                </label>
+                <StateSelect
+                  countryid={countryid}
+                  containerClassName="form-group"
+                  inputClassName="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  onChange={(e: { id: React.SetStateAction<number> }) => {
+                    setStateid(e.id);
+                  }}
+                  placeHolder="주/도를 선택해주세요"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  도시
+                </label>
+                <CitySelect
+                  countryid={countryid}
+                  stateid={stateid}
+                  containerClassName="form-group"
+                  inputClassName="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  onChange={handleCityChange}
+                  placeHolder="도시를 선택해주세요"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  상세 주소 <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="location"
+                  value={formData.location}
+                  onChange={handleChange}
+                  placeholder="상세 주소를 입력해주세요"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                />
+              </div>
+
+              <div className="rounded-lg overflow-hidden border border-gray-300">
+                {isLoaded ? (
+                  <GoogleMap 
+                    mapContainerStyle={{
+                      width: '100%',
+                      height: '300px',
+                    }} 
+                    center={center} 
+                    zoom={8} 
+                    onLoad={onLoad} 
+                    onUnmount={onUnmount}
+                  >
+                    {showMarker && <Marker position={userLocation} />}
+                  </GoogleMap>
+                ) : (
+                  <div className="h-[300px] flex items-center justify-center bg-gray-100">
+                    <p className="text-gray-500">지도를 불러오는 중...</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
+
+          {/* 추가 정보 섹션 */}
+          <section className="space-y-4">
+            <h2 className="text-xl font-semibold text-gray-700 border-b pb-2">추가 정보</h2>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  언어 <span className="text-red-500">*</span>
+                </label>
+                <LanguageSelect
+                  containerClassName="form-group"
+                  inputClassName="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  onChange={handleLanguageChange}
+                  displayNative={false}
+                  placeHolder="사용 언어를 선택해주세요"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  필요한 사역 <span className="text-red-500">*</span>
+                </label>
+                <Select
+                  instanceId="taskSelect"
+                  isMulti
+                  options={taskOptions}
+                  name="tasks"
+                  placeholder="필요한 사역을 선택해주세요"
+                  className="basic-multi-select"
+                  classNamePrefix="select"
+                  onChange={(selected) =>
+                    setFormData({ ...formData, tasks: selected.map((s) => s.value) })
+                  }
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  대표 이미지
+                </label>
+                <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                  <div className="space-y-1 text-center">
+                    <svg
+                      className="mx-auto h-12 w-12 text-gray-400"
+                      stroke="currentColor"
+                      fill="none"
+                      viewBox="0 0 48 48"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 015.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                        strokeWidth={2}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                    <div className="flex text-sm text-gray-600">
+                      <label
+                        htmlFor="file-upload"
+                        className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
+                      >
+                        <span>이미지 업로드</span>
+                        <input
+                          id="file-upload"
+                          name="image"
+                          type="file"
+                          className="sr-only"
+                          onChange={handleFileUpload}
+                        />
+                      </label>
+                      <p className="pl-1">또는 드래그 앤 드롭</p>
+                    </div>
+                    <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  상세 설명 <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  placeholder="선교지에 대한 상세한 설명을 입력해주세요"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent h-32"
+                  required
+                ></textarea>
+              </div>
+            </div>
+          </section>
+
+          <div className="flex justify-end space-x-4 pt-6">
+            <button
+              type="button"
+              onClick={() => router.back()}
+              className="px-6 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              취소
+            </button>
+            <button
+              type="submit"
+              className="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              등록하기
+            </button>
           </div>
-          <div className="w-1/2">
-            <label className="block text-gray-700 mb-2">END DATE</label>
-            <DatePicker
-              name="end_date"
-              selected={new Date(formData.end_date)}
-              onChange={(date: Date) => {
-                setFormData({
-                  ...formData,
-                  end_date: format(date, "yyyy-MM-dd"),
-                });
-              }}
-              dateFormat="yyyy-MM-dd"
-              className="border p-2 rounded w-full"
-            />
-          </div>
-        </div>
-        <div className="col-lg-6 mx-auto">
-          <h6 className="mt-3 mb-3">Country</h6>
-          <CountrySelect
-            containerClassName="form-group"
-            inputClassName=""
-            onChange={handleCountryChange}  // 이 부분을 수정
-            onTextChange={(e: any) => {
-              console.log(e);
-            }}
-            placeHolder="Select Country"
-          />
-          <h6 className="mt-3 mb-3">State</h6>
-          <StateSelect
-            countryid={countryid}
-            containerClassName="form-group"
-            inputClassName="form-control"
-            onChange={(e: { id: React.SetStateAction<number> }) => {
-              setStateid(e.id);
-            }}
-            onTextChange={(e: any) => {
-              console.log(e);
-            }}
-            placeHolder="Select State"
-          />
-         <h6 className="mt-3 mb-3">City</h6>
-          <CitySelect
-            countryid={countryid}
-            stateid={stateid}
-            containerClassName="form-group"
-            inputClassName="form-control"
-            onChange={handleCityChange}
-            onTextChange={(e: any) => {
-              console.log(e);
-            }}
-            placeHolder="Select City"
-          />
-          <input
-          type="text"
-          name="location"
-          value={formData.location}
-          onChange={handleChange}
-          placeholder="Location"
-          className="border p-2 rounded mb-4 w-full"
-          />
-          <div style={{ width: "100%", height: "400px" }} className="flex justify-center items-center">
-            {isLoaded ? (
-              <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={8} onLoad={onLoad} onUnmount={onUnmount}>
-                {/* You can put markers, info windows, etc. as child components here */}
-                {showMarker && <Marker position={userLocation} />}
-              </GoogleMap>
-            ) : (
-              <p>Loading map...</p>
-            )}
-          </div>
-          <h6 className="mt-3 mb-3">Language</h6>
-          <LanguageSelect
-            containerClassName="form-group"
-            inputClassName="form-control"
-            onChange={handleLanguageChange}
-            onTextChange={(e: any) => {
-              console.log(e);
-            }}
-            displayNative={false}
-            placeHolder="Select Language"
-          />
-        </div>
-        <Select
-          instanceId="taskSelect"
-          isMulti
-          options={taskOptions}
-          name="tasks"
-          placeholder="tasks"
-          onChange={(selected) =>
-            setFormData({ ...formData, tasks: selected.map((s) => s.value) })
-          }
-        />
-        <div>
-          <h1>Image</h1>
-        <input type="file" name="image" onChange={handleFileUpload} />
-        </div>
-        <textarea
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-          placeholder="DESCRIPTION."
-          className="border p-2 rounded mb-4 w-full"
-        ></textarea>
-        {/* 이미지 URL과 지도 정보 등도 추가할 수 있습니다. */}
-        <button
-          type="submit"
-          className="bg-blue-500 text-white p-2 rounded w-full mt-4"
-        >
-          submit
-        </button>
-      </form>
+        </form>
+      </div>
     </main>
   );
 }
