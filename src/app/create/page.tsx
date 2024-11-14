@@ -1,53 +1,23 @@
 // src/app/create/page.tsx
-"use client"; // 이 부분을 추가
-import React, { useState, ChangeEvent, useEffect, useRef, useCallback } from "react";
+"use client"; 
+import React, { useState, ChangeEvent, useEffect, useCallback } from "react";
 import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { useRouter } from "next/navigation";
-import { GoogleMap, useJsApiLoader,Marker } from '@react-google-maps/api';
-import Select from "react-select"; // react-select 라이브러리
+import Select from "react-select"; 
 import {
   Country,
-  Language,
-  City,
   State,
-  CitySelect,
-  CountrySelect,
-  StateSelect,
-  LanguageSelect,
+  City,
+  Language,
   GetCountries,
+  GetState,
+  GetCity,
   GetLanguages,
 } from "react-country-state-city";
-import "react-country-state-city/dist/react-country-state-city.css";
-import Script from "next/script";
-import Image from 'next/image';
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-type Task = {
-  id: number;
-  name: string;
-  // other properties...
-};
-const useFetchTasks = () => {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  process.env.NEXT_PUBLIC_API_URL
-  useEffect(() => {
-    const fetchTasks = async () => {
-      const res = await fetch(apiUrl+"/api-task/", {
-        headers: {
-          accept: "application/json",
-        },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setTasks(data);
-      }
-    };
-    fetchTasks();
-  }, []);
 
-  return tasks;
-};
+// Leaflet 기본 아이콘 문제 해결
 const icon = L.icon({
   iconUrl: '/marker-icon.png',
   iconRetinaUrl: '/marker-icon-2x.png',
@@ -85,9 +55,32 @@ function ChangeView({ center, zoom }: { center: L.LatLngExpression; zoom: number
   return null;
 }
 
+// Custom hook to fetch tasks
+const useFetchTasks = () => {
+  const [tasks, setTasks] = useState([]);
+
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const response = await fetch("/api/tasks");
+        if (!response.ok) {
+          throw new Error("Failed to fetch tasks");
+        }
+        const data = await response.json();
+        setTasks(data);
+      } catch (error) {
+        console.error("Error fetching tasks:", error);
+      }
+    };
+
+    fetchTasks();
+  }, []);
+
+  return tasks;
+};
+
 export default function CreatePage() {
-   // State to hold user's current location
-  const [center, setCenter] = useState<L.LatLngExpression>([37.5665, 126.9780]); // 서울
+  const [center, setCenter] = useState<L.LatLngExpression>([37.5665, 126.9780]); 
   const [zoom, setZoom] = useState(13);
   const [markerPosition, setMarkerPosition] = useState<L.LatLng | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
@@ -100,19 +93,16 @@ export default function CreatePage() {
   const [stateList, setStateList] = useState([]);
   const [cityList, setCityList] = useState([]);
   const [languageList, setLanguageList] = useState<Language[]>([]);
-  // const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAP_KEY;
   const router = useRouter();
-  // Use the custom hook here
   const tasks = useFetchTasks();
-  const [isGoogleLibReady, setGoogleLibReady] = useState(false);
-  const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAP_KEY;
+  
   const [formData, setFormData] = useState({
-    user :"1",
+    user: "1",
     type: "",
     title: "",
     location: "",
-    start_date: new Date().toISOString().split("T")[0], // Today's date
-    end_date: new Date().toISOString().split("T")[0], // Today's date
+    start_date: new Date().toISOString().split("T")[0], 
+    end_date: new Date().toISOString().split("T")[0], 
     language: "",
     description: "",
     image: "",
@@ -120,119 +110,9 @@ export default function CreatePage() {
     longitude: "",
     zoom: "",
     country: "",
-    tasks: [] as number[], // Assuming tasks are an array of integers
+    tasks: [] as number[], 
   });
-  const mapRef = useRef(null); // 지도가 그려질 DOM 요소를 참조
-  const initMap = () => {
-    if (mapRef.current) {
-      // Add this check
-      const google = window.google;
 
-      const sydney = new google.maps.LatLng(-33.867, 151.195);
-      const infowindow = new google.maps.InfoWindow();
-      const map = new google.maps.Map(mapRef.current, {
-        center: sydney,
-        zoom: 15,
-      });
-
-      const request = {
-        query: "Museum of Contemporary Art Australia",
-        fields: ["name", "geometry"],
-      };
-
-      const service = new google.maps.places.PlacesService(map);
-
-      service.findPlaceFromQuery(request, function (results, status) {
-        if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-          for (let i = 0; i < results.length; i++) {
-            createMarker(results[i]);
-          }
-          if (results[0].geometry && results[0].geometry.location) {
-            map.setCenter(results[0].geometry.location);
-          }
-        }
-      });
-
-      const createMarker = (place: google.maps.places.PlaceResult) => {
-        if (place.geometry?.location) {
-          const marker = new google.maps.Marker({
-            map,
-            position: place.geometry.location,
-          });
-          google.maps.event.addListener(
-            marker,
-            "click",
-            function (this: google.maps.Marker) {
-              infowindow.setContent(place.name);
-              infowindow.open(map, this);
-            }
-          );
-        }
-      };
-    }
-  };
-
-  const { isLoaded } = useJsApiLoader({
-    id: 'google-map-script',
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAP_KEY || ''
-  })
-  
-  const [map, setMap] = React.useState(null)
-
-  const onLoad = React.useCallback(function callback(map:any) {
-    // This is just an example of getting and using the map instance!!! don't just blindly copy!
-    const bounds = new window.google.maps.LatLngBounds(center);
-    map.fitBounds(bounds);
-    setMap(map)
-  }, [])
-
-  const onUnmount = React.useCallback(function callback(map:any) {
-    setMap(null)
-  }, [])
-
-  const [mapError, setMapError] = useState<string | null>(null);
-  const [locationError, setLocationError] = useState<string | null>(null);
-
-  useEffect(() => {
-    // Function to run when the Google Maps library is ready
-    const onGoogleMapReady = () => {
-      setGoogleLibReady(true);
-    };
-
-    // Try to get user's current location
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setCenter([position.coords.latitude, position.coords.longitude]);
-          setMarkerPosition(L.latLng(position.coords.latitude, position.coords.longitude));
-          setLocationError(null);
-        },
-        (error) => {
-          console.log("위치 정보를 가져올 수 없습니다:", error.message);
-          setLocationError("위치 정보를 가져올 수 없습니다. 지도를 클릭하여 위치를 선택해주세요.");
-          // 기본 위치를 서울로 설정
-          setCenter([37.5665, 126.9780]);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 5000,
-          maximumAge: 0
-        }
-      );
-    } else {
-      setLocationError("이 브라우저에서는 위치 서비스를 지원하지 않습니다.");
-      // 기본 위치를 서울로 설정
-      setCenter([37.5665, 126.9780]);
-    }
-  }, []);
-
-  // Google Maps 로드 에러 처리
-  const handleLoadError = (error: Error) => {
-    console.log("Google Maps 로드 실패:", error);
-    setMapError("지도를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.");
-  };
-
-  // Explicitly setting types for e
   const handleCountryChange = (e: any) => {
     const countryName = e?.name || '';
     const countryId = e?.id || 0;
@@ -240,12 +120,11 @@ export default function CreatePage() {
       ...formData,
       country: countryName,
     });
-    setCountryid(countryId); // Don't forget to update countryid as well
+    setCountryid(countryId); 
   };
   
 
   const handleStateChange = (e: any) => {
-    // Replace any with the correct type
     setStateid(e.id);
   };
 
@@ -254,14 +133,12 @@ export default function CreatePage() {
     const languageCode = e?.code || '';
     setFormData({
       ...formData,
-      language: languageCode,  // 언어 코드 저장
+      language: languageCode,  
     });
   };
 
 
   const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
-    // Handle file upload and get image URL
-    // For now, just setting the file name as the image URL
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setFormData({ ...formData, image: file.name });
@@ -288,7 +165,6 @@ export default function CreatePage() {
   };
 
   const handleAsyncSubmit = async () => {
-    // Validation before sending formData to server
     if (!formData.country) {
           alert("Country is required.");
           return;
@@ -308,14 +184,14 @@ export default function CreatePage() {
     }
   
     console.log(JSON.stringify(formData));
-    const res = await fetch(apiUrl+"/api-job/posting/", {
+    const res = await fetch("/api-job/posting/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
         ...formData,
-        user_id: "1", // Replace this with the actual user ID
+        user_id: "1", 
       }),
     });
   
@@ -334,80 +210,21 @@ export default function CreatePage() {
     label: task.name,
   }));
 
-  // 도시 선택 시 실행할 함수
   const handleCityChange = (e: any) => {
     console.log(e);
-    const google = window.google;
-    if (mapRef.current) {
-      // Add this check
-      const sydney = new google.maps.LatLng(-33.867, 151.195);
-      const infowindow = new google.maps.InfoWindow();
-      const cityName = e?.name || '';  // 가정: e.name에 도시 이름이 들어있다.
+    const cityName = e?.name || '';  
 
-    
-      // Places API를 사용한 도시 검색
-      const request = {
-        query: cityName,
-        fields: ['name', 'geometry'],
-      };
-      const map = new google.maps.Map(mapRef.current, {
-        center: sydney,
-        zoom: 15,
+    const coordinates = GetCity(cityName);
+    if (coordinates) {
+      const lat = coordinates[0].latitude;
+      const lng = coordinates[0].longitude;
+      setFormData({
+        ...formData,
+        latitude: lat,
+        longitude: lng,
       });
-      const service = new google.maps.places.PlacesService(map); // map은 Google Maps 객체입니다.
-    
-      // service.findPlaceFromQuery(request, function(results, status) {
-      //   if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-      //     const coordinates = results[0]?.geometry?.location;
-      //     if (coordinates) {
-      //       const lat = coordinates.lat();
-      //       const lng = coordinates.lng();
-      //       // 좌표를 state나 form data에 저장
-      //       setFormData({
-      //         ...formData,
-      //         latitude: lat,
-      //         longitude: lng,
-      //         // ... 기타 필드
-      //       });
-      //       // 지도 중심을 새로운 좌표로 이동
-      //       setUserLocation({ lat, lng });
-      //     }
-      //   }
-      // });
-  }
-}
-
-  useEffect(() => {
-    // Function to run when the Google Maps library is ready
-    const onGoogleMapReady = () => {
-      setGoogleLibReady(true);
-    };
-    // Try to get user's current location
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setCenter([position.coords.latitude, position.coords.longitude]);
-          setMarkerPosition(L.latLng(position.coords.latitude, position.coords.longitude));
-          setLocationError(null);
-        },
-        (error) => {
-          console.log("위치 정보를 가져올 수 없습니다:", error.message);
-          setLocationError("위치 정보를 가져올 수 없습니다. 지도를 클릭하여 위치를 선택해주세요.");
-          // 기본 위치를 서울로 설정
-          setCenter([37.5665, 126.9780]);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 5000,
-          maximumAge: 0
-        }
-      );
-    } else {
-      setLocationError("이 브라우저에서는 위치 서비스를 지원하지 않습니다.");
-      // 기본 위치를 서울로 설정
-      setCenter([37.5665, 126.9780]);
     }
-  }, []);
+  };
 
   useEffect(() => {
     GetCountries().then((result) => {
@@ -422,16 +239,6 @@ export default function CreatePage() {
     });
   }, []);
 
-  useEffect(() => {
-    if (isGoogleLibReady) {
-      // Google Maps 스크립트가 로드된 후 실행되는 코드
-      initMap();
-    }
-  }, []);
-
-  
-
-  // 위치 찾기 성공 핸들러
   const handleLocationFound = useCallback((latlng: L.LatLng) => {
     setMarkerPosition(latlng);
     setCenter([latlng.lat, latlng.lng]);
@@ -443,13 +250,11 @@ export default function CreatePage() {
     setLocationError(null);
   }, []);
 
-  // 위치 찾기 실패 핸들러
   const handleLocationError = useCallback((error: L.ErrorEvent) => {
     console.log("위치 정보를 가져올 수 없습니다:", error.message);
     setLocationError("위치 정보를 가져올 수 없습니다. 지도를 클릭하여 위치를 선택해주세요.");
   }, []);
 
-  // 현재 위치 찾기
   const findMyLocation = useCallback(() => {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
@@ -558,42 +363,58 @@ export default function CreatePage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   국가 <span className="text-red-500">*</span>
                 </label>
-                <CountrySelect
-                  containerClassName="form-group"
-                  inputClassName="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  onChange={handleCountryChange}
-                  placeHolder="국가를 선택해주세요"
+                <select
+                  name="country"
+                  value={formData.country}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
-                />
+                >
+                  <option value="">선택해주세요</option>
+                  {countryList.map((country) => (
+                    <option key={country.id} value={country.name}>
+                      {country.name}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   주/도
                 </label>
-                <StateSelect
-                  countryid={countryid}
-                  containerClassName="form-group"
-                  inputClassName="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  onChange={(e: { id: React.SetStateAction<number> }) => {
-                    setStateid(e.id);
-                  }}
-                  placeHolder="주/도를 선택해주세요"
-                />
+                <select
+                  name="state"
+                  value={formData.state}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">선택해주세요</option>
+                  {stateList.map((state) => (
+                    <option key={state.id} value={state.name}>
+                      {state.name}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   도시
                 </label>
-                <CitySelect
-                  countryid={countryid}
-                  stateid={stateid}
-                  containerClassName="form-group"
-                  inputClassName="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  onChange={handleCityChange}
-                  placeHolder="도시를 선택해주세요"
-                />
+                <select
+                  name="city"
+                  value={formData.city}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">선택해주세요</option>
+                  {cityList.map((city) => (
+                    <option key={city.id} value={city.name}>
+                      {city.name}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div>
@@ -660,14 +481,20 @@ export default function CreatePage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   언어 <span className="text-red-500">*</span>
                 </label>
-                <LanguageSelect
-                  containerClassName="form-group"
-                  inputClassName="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  onChange={handleLanguageChange}
-                  displayNative={false}
-                  placeHolder="사용 언어를 선택해주세요"
+                <select
+                  name="language"
+                  value={formData.language}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
-                />
+                >
+                  <option value="">선택해주세요</option>
+                  {languageList.map((language) => (
+                    <option key={language.code} value={language.code}>
+                      {language.name}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div>
