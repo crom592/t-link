@@ -5,17 +5,27 @@ interface FeatureListProps {
 
 export default function FeatureList({ title, features }: FeatureListProps) {
   return (
-    <div className="text-center">
-      <h2 className="text-3xl font-bold mb-8 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 bg-clip-text text-transparent">
+    <div className="bg-white rounded-lg shadow-sm p-8 mb-8">
+      <h2 className="text-2xl font-semibold mb-6 text-gray-900">
         {title}
       </h2>
       <ul className="space-y-4">
         {features.map((feature, index) => (
-          <li
-            key={index}
-            className="bg-white/5 backdrop-blur-lg rounded-lg p-4 shadow-lg hover:bg-white/10 transition-all duration-300"
-          >
-            <span className="text-lg text-white/80">{feature}</span>
+          <li key={index} className="flex items-start">
+            <svg
+              className="h-6 w-6 text-blue-600 mr-3 mt-0.5 flex-shrink-0"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+            <span className="text-gray-700">{feature}</span>
           </li>
         ))}
       </ul>

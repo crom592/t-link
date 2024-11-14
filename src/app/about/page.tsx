@@ -14,51 +14,49 @@ export default function About() {
   };
 
   return (
-    <div className="min-h-screen py-16 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-16 px-4 sm:px-6 lg:px-8 bg-gray-50">
       <div className="max-w-4xl mx-auto">
         <div className="text-center">
-          <h1 className="text-5xl font-bold mb-8 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold mb-8 text-gray-900">
             About T-LINK
           </h1>
-          <p className="text-xl mb-12 text-white/80">
-            T-LINK is a platform for matching local missionaries with short-term missionaries.
+          <p className="text-xl mb-12 text-gray-600">
+            T-LINK connects local missionaries with short-term missionaries worldwide.
           </p>
         </div>
 
         <div className="mb-16">
-          <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-            <div className="absolute inset-0 bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-indigo-500/10"></div>
+          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
             <Image
-              src="/images/t-link-about.png"
-              alt="About Image"
+              src="/images/mission-connection.svg"
+              alt="Mission Connection"
               width={800}
               height={400}
-              className="w-full h-auto object-cover transform hover:scale-105 transition-transform duration-500"
+              className="w-full h-auto"
             />
           </div>
         </div>
 
         <div className="mb-16">
           <FeatureList
-            title="Features"
+            title="Key Features"
             features={[
-              'Organizations and individuals can sign up (including social media logins)',
-              'Mission field matching system',
-              'Real-time communication',
-              'Resource sharing platform'
+              'Simple sign-up process for organizations and individuals',
+              'Smart mission field matching system',
+              'Real-time communication platform',
+              'Resource sharing and collaboration tools'
             ]}
           />
         </div>
 
         <div className="mb-16">
-          <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-            <div className="absolute inset-0 bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-indigo-500/10"></div>
+          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
             <Image
-              src="/images/Links.png"
-              alt="Links"
+              src="/images/mission-workflow.svg"
+              alt="Mission Workflow"
               width={800}
               height={400}
-              className="w-full h-auto object-cover transform hover:scale-105 transition-transform duration-500"
+              className="w-full h-auto"
             />
           </div>
         </div>
@@ -66,21 +64,23 @@ export default function About() {
         <div className="text-center">
           <button
             onClick={handleToggle}
-            className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:from-pink-400 hover:via-purple-400 hover:to-indigo-400 text-white px-8 py-3 rounded-lg text-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg text-lg font-medium transition-colors"
           >
             {showFutureFeatures ? 'Hide Future Features' : 'Show Future Features'}
           </button>
-        </div>
 
-        {showFutureFeatures && (
-          <FeatureList
-            title="Coming Soon"
-            features={[
-              'Provide an About page for your short-term mission program',
-              'Provide community and blogging features'
-            ]}
-          />
-        )}
+          {showFutureFeatures && (
+            <FeatureList
+              title="Coming Soon"
+              features={[
+                'Interactive mission program showcase',
+                'Community forums and blogs',
+                'Resource library and training materials',
+                'Mobile application for on-the-go access'
+              ]}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

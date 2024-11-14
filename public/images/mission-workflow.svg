@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="400" viewBox="0 0 800 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="800" height="400" fill="#F8FAFC"/>
+  
+  <!-- Workflow Steps -->
+  <g transform="translate(100,50)">
+    <!-- Step 1: Sign Up -->
+    <rect x="0" y="0" width="120" height="80" rx="8" fill="#DBEAFE"/>
+    <text x="60" y="45" text-anchor="middle" fill="#2563EB" font-family="Arial" font-size="14">Sign Up</text>
+    
+    <!-- Arrow 1 -->
+    <path d="M130 40 H180" stroke="#E2E8F0" stroke-width="4" marker-end="url(#arrowhead)"/>
+    
+    <!-- Step 2: Profile -->
+    <rect x="190" y="0" width="120" height="80" rx="8" fill="#DBEAFE"/>
+    <text x="250" y="45" text-anchor="middle" fill="#2563EB" font-family="Arial" font-size="14">Create Profile</text>
+    
+    <!-- Arrow 2 -->
+    <path d="M320 40 H370" stroke="#E2E8F0" stroke-width="4" marker-end="url(#arrowhead)"/>
+    
+    <!-- Step 3: Match -->
+    <rect x="380" y="0" width="120" height="80" rx="8" fill="#DBEAFE"/>
+    <text x="440" y="45" text-anchor="middle" fill="#2563EB" font-family="Arial" font-size="14">Find Match</text>
+    
+    <!-- Arrow 3 -->
+    <path d="M440 90 L440 140" stroke="#E2E8F0" stroke-width="4" marker-end="url(#arrowhead)"/>
+    
+    <!-- Step 4: Connect -->
+    <rect x="380" y="150" width="120" height="80" rx="8" fill="#DBEAFE"/>
+    <text x="440" y="195" text-anchor="middle" fill="#2563EB" font-family="Arial" font-size="14">Connect</text>
+    
+    <!-- Arrow 4 -->
+    <path d="M370 190 H320" stroke="#E2E8F0" stroke-width="4" marker-end="url(#arrowhead)"/>
+    
+    <!-- Step 5: Collaborate -->
+    <rect x="190" y="150" width="120" height="80" rx="8" fill="#DBEAFE"/>
+    <text x="250" y="195" text-anchor="middle" fill="#2563EB" font-family="Arial" font-size="14">Collaborate</text>
+  </g>
+  
+  <!-- Arrow Marker -->
+  <defs>
+    <marker
+      id="arrowhead"
+      markerWidth="10"
+      markerHeight="7"
+      refX="9"
+      refY="3.5"
+      orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#E2E8F0"/>
+    </marker>
+  </defs>
+</svg>
