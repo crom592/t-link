@@ -1,16 +1,18 @@
 //this file location: /src/app/about/page.tsx
 // /src/app/about/page.tsx
 'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
 import FeatureList from './FeatureList';
+import AboutContent from './AboutContent';
 
 export default function About() {
-  return <AboutContent />;
+  return <AboutContentComponent />;
 }
 
-function AboutContent() {
+function AboutContentComponent() {
   const [showFutureFeatures, toggleFutureFeatures] = useState(false);
 
   const handleToggle = () => {

@@ -1,7 +1,5 @@
 "use client";
 import React, { useState, ChangeEvent, useEffect, useCallback } from "react";
-import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { useRouter } from 'next/navigation';
 import {
@@ -14,6 +12,7 @@ import {
   GetCity,
   GetLanguages,
 } from "react-country-state-city";
+import dynamic from 'next/dynamic';
 
 // Custom types
 interface Task {
@@ -26,32 +25,11 @@ interface LanguageOption {
   name: string;
 }
 
-// Map event components
-function MapEvents({ onLocationFound, onLocationError }: { 
-  onLocationFound: (location: L.LatLng) => void;
-  onLocationError: (error: L.ErrorEvent) => void;
-}) {
-  const map = useMapEvents({
-    locationfound(e) {
-      onLocationFound(e.latlng);
-      map.flyTo(e.latlng, map.getZoom());
-    },
-    locationerror(e) {
-      onLocationError(e);
-    },
-    click(e) {
-      onLocationFound(e.latlng);
-    }
-  });
-  return null;
-}
-
-// Change view component
-function ChangeView({ center, zoom }: { center: L.LatLngExpression; zoom: number }) {
-  const map = useMap();
-  map.setView(center, zoom);
-  return null;
-}
+// Dynamically import the Map component with no SSR
+const MapComponent = dynamic(() => import('./Map'), {
+  ssr: false,
+  loading: () => <div className="h-96 bg-gray-100" />
+});
 
 function useFetchTasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -181,15 +159,12 @@ export default function CreatePageComponent() {
         throw new Error('Failed to create task');
       }
 
-      // Redirect to the task list page or show success message
       router.push('/main');
     } catch (error) {
       console.error('Error creating task:', error);
-      // Handle error (show error message to user)
     }
   };
 
-  // Initialize react-country-state-city
   useEffect(() => {
     const initializeCountryStateCity = async () => {
       try {
@@ -226,227 +201,236 @@ export default function CreatePageComponent() {
   }, []);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Create New Task</h1>
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-            Title
-          </label>
-          <input
-            type="text"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="type" className="block text-sm font-medium text-gray-700">
-            Type
-          </label>
-          <select
-            name="type"
-            value={formData.type}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="">Select a type</option>
-            <option value="type1">Type 1</option>
-            <option value="type2">Type 2</option>
-            <option value="type3">Type 3</option>
-          </select>
-        </div>
-
-        <div>
-          <label htmlFor="country" className="block text-sm font-medium text-gray-700">
-            Country
-          </label>
-          <select
-            name="country"
-            value={formData.country}
-            onChange={(e) => {
-              const selectedCountry = countryList.find(country => country.name === e.target.value);
-              if (selectedCountry) {
-                handleCountryChange(selectedCountry);
-              }
-            }}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="">Select a country</option>
-            {countryList.map((country) => (
-              <option key={country.id} value={country.name}>
-                {country.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label htmlFor="state" className="block text-sm font-medium text-gray-700">
-            State
-          </label>
-          <select
-            name="state"
-            value={formData.state}
-            onChange={(e) => {
-              const selectedState = stateList.find(state => state.name === e.target.value);
-              if (selectedState) {
-                handleStateChange(selectedState);
-              }
-            }}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="">Select a state</option>
-            {stateList.map((state) => (
-              <option key={state.id} value={state.name}>
-                {state.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label htmlFor="city" className="block text-sm font-medium text-gray-700">
-            City
-          </label>
-          <select
-            name="city"
-            value={formData.city}
-            onChange={(e) => {
-              const selectedCity = cityList.find(city => city.name === e.target.value);
-              if (selectedCity) {
-                handleCityChange(selectedCity);
-              }
-            }}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="">Select a city</option>
-            {cityList.map((city) => (
-              <option key={city.id} value={city.name}>
-                {city.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label htmlFor="language" className="block text-sm font-medium text-gray-700">
-            Language
-          </label>
-          <select
-            name="language"
-            value={formData.language}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="">Select a language</option>
-            {languageList.map((lang) => (
-              <option key={lang.id} value={lang.name}>
-                {lang.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label htmlFor="start_date" className="block text-sm font-medium text-gray-700">
-            Start Date
-          </label>
-          <input
-            type="date"
-            name="start_date"
-            value={formData.start_date}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="end_date" className="block text-sm font-medium text-gray-700">
-            End Date
-          </label>
-          <input
-            type="date"
-            name="end_date"
-            value={formData.end_date}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-            Description
-          </label>
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            rows={4}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="tasks" className="block text-sm font-medium text-gray-700">
-            Tasks
-          </label>
-          <select
-            multiple
-            name="tasks"
-            value={formData.tasks.map(String)}
-            onChange={(e) => {
-              const selectedOptions = Array.from(e.target.selectedOptions, option => Number(option.value));
-              setFormData(prev => ({
-                ...prev,
-                tasks: selectedOptions
-              }));
-            }}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            {tasks.map((task) => (
-              <option key={task.id} value={task.id}>
-                {task.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="h-96 relative mb-4">
-          <MapContainer
-            center={center}
-            zoom={zoom}
-            style={{ height: '100%', width: '100%' }}
-          >
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <h1 className="text-3xl font-bold mb-8 text-gray-800">Create New Task</h1>
+      <div className="bg-white rounded-lg shadow-lg p-6">
+        <div className="space-y-6">
+          {/* Map Section */}
+          <div className="w-full">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Select Location
+            </label>
+            <MapComponent
+              center={center}
+              zoom={zoom}
+              markerPosition={markerPosition}
+              onLocationFound={(location) => {
+                setMarkerPosition(location);
+                setCenter([location.lat, location.lng]);
+                setFormData(prev => ({
+                  ...prev,
+                  latitude: location.lat.toString(),
+                  longitude: location.lng.toString(),
+                  zoom: zoom.toString()
+                }));
+              }}
+              onLocationError={(error) => {
+                setLocationError(error.message);
+              }}
             />
-            {markerPosition && (
-              <Marker position={markerPosition} />
+            {locationError && (
+              <p className="mt-2 text-sm text-red-600">{locationError}</p>
             )}
-            <MapEvents
-              onLocationFound={handleLocationFound}
-              onLocationError={handleLocationError}
-            />
-            <ChangeView center={center} zoom={zoom} />
-          </MapContainer>
-          {locationError && (
-            <div className="text-red-500 mt-2">{locationError}</div>
-          )}
-        </div>
+          </div>
 
-        <div>
-          <button
-            type="submit"
-            className="w-full px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          >
-            Create Task
-          </button>
+          {/* Rest of the form */}
+          <form onSubmit={handleSubmit}>
+            <div>
+              <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+                Title
+              </label>
+              <input
+                type="text"
+                name="title"
+                value={formData.title}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="type" className="block text-sm font-medium text-gray-700">
+                Type
+              </label>
+              <select
+                name="type"
+                value={formData.type}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="">Select a type</option>
+                <option value="type1">Type 1</option>
+                <option value="type2">Type 2</option>
+                <option value="type3">Type 3</option>
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="country" className="block text-sm font-medium text-gray-700">
+                Country
+              </label>
+              <select
+                name="country"
+                value={formData.country}
+                onChange={(e) => {
+                  const selectedCountry = countryList.find(country => country.name === e.target.value);
+                  if (selectedCountry) {
+                    handleCountryChange(selectedCountry);
+                  }
+                }}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="">Select a country</option>
+                {countryList.map((country) => (
+                  <option key={country.id} value={country.name}>
+                    {country.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="state" className="block text-sm font-medium text-gray-700">
+                State
+              </label>
+              <select
+                name="state"
+                value={formData.state}
+                onChange={(e) => {
+                  const selectedState = stateList.find(state => state.name === e.target.value);
+                  if (selectedState) {
+                    handleStateChange(selectedState);
+                  }
+                }}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="">Select a state</option>
+                {stateList.map((state) => (
+                  <option key={state.id} value={state.name}>
+                    {state.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="city" className="block text-sm font-medium text-gray-700">
+                City
+              </label>
+              <select
+                name="city"
+                value={formData.city}
+                onChange={(e) => {
+                  const selectedCity = cityList.find(city => city.name === e.target.value);
+                  if (selectedCity) {
+                    handleCityChange(selectedCity);
+                  }
+                }}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="">Select a city</option>
+                {cityList.map((city) => (
+                  <option key={city.id} value={city.name}>
+                    {city.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="language" className="block text-sm font-medium text-gray-700">
+                Language
+              </label>
+              <select
+                name="language"
+                value={formData.language}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="">Select a language</option>
+                {languageList.map((lang) => (
+                  <option key={lang.id} value={lang.name}>
+                    {lang.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="start_date" className="block text-sm font-medium text-gray-700">
+                Start Date
+              </label>
+              <input
+                type="date"
+                name="start_date"
+                value={formData.start_date}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="end_date" className="block text-sm font-medium text-gray-700">
+                End Date
+              </label>
+              <input
+                type="date"
+                name="end_date"
+                value={formData.end_date}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                Description
+              </label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                rows={4}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="tasks" className="block text-sm font-medium text-gray-700">
+                Tasks
+              </label>
+              <select
+                multiple
+                name="tasks"
+                value={formData.tasks.map(String)}
+                onChange={(e) => {
+                  const selectedOptions = Array.from(e.target.selectedOptions, option => Number(option.value));
+                  setFormData(prev => ({
+                    ...prev,
+                    tasks: selectedOptions
+                  }));
+                }}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                {tasks.map((task) => (
+                  <option key={task.id} value={task.id}>
+                    {task.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <button
+                type="submit"
+                className="w-full px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              >
+                Create Task
+              </button>
+            </div>
+          </form>
         </div>
-      </form>
+      </div>
     </div>
   );
 }

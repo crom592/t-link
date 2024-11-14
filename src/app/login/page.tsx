@@ -2,7 +2,7 @@
 
 import { signIn, signOut, useSession } from "next-auth/react";
 
-export default function LoginPage() {
+export default function LoginContent() {
   const { data: session, status } = useSession();
   const isLoading = status === "loading";
 
