@@ -1,9 +1,9 @@
 // src/app/create/page.tsx
 "use client"; // 이 부분을 추가
-import React, { useState, ChangeEvent, useEffect, useRef } from "react";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import format from "date-fns/format";
+import React, { useState, ChangeEvent, useEffect, useRef, useCallback } from "react";
+import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
 import { useRouter } from "next/navigation";
 import { GoogleMap, useJsApiLoader,Marker } from '@react-google-maps/api';
 import Select from "react-select"; // react-select 라이브러리
@@ -48,19 +48,49 @@ const useFetchTasks = () => {
 
   return tasks;
 };
+const icon = L.icon({
+  iconUrl: '/marker-icon.png',
+  iconRetinaUrl: '/marker-icon-2x.png',
+  shadowUrl: '/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+// 지도 이벤트를 처리하는 컴포넌트
+function MapEvents({ onLocationFound, onLocationError }: { 
+  onLocationFound: (location: L.LatLng) => void;
+  onLocationError: (error: L.ErrorEvent) => void;
+}) {
+  const map = useMapEvents({
+    locationfound(e) {
+      onLocationFound(e.latlng);
+      map.flyTo(e.latlng, map.getZoom());
+    },
+    locationerror(e) {
+      onLocationError(e);
+    },
+    click(e) {
+      onLocationFound(e.latlng);
+    }
+  });
+  return null;
+}
+
+// 지도 중심을 변경하는 컴포넌트
+function ChangeView({ center, zoom }: { center: L.LatLngExpression; zoom: number }) {
+  const map = useMap();
+  map.setView(center, zoom);
+  return null;
+}
+
 export default function CreatePage() {
    // State to hold user's current location
-  const [userLocation, setUserLocation] = useState({
-    lat: -3.745, // default values
-    lng: -38.523,
-  });
-  const center = userLocation; // Use the user's location as the center
-  // State to manage marker rendering
-  const [showMarker, setShowMarker] = useState(false);
-  const containerStyle = {
-    width: '100%',
-    height: '400px'
-  };
+  const [center, setCenter] = useState<L.LatLngExpression>([37.5665, 126.9780]); // 서울
+  const [zoom, setZoom] = useState(13);
+  const [markerPosition, setMarkerPosition] = useState<L.LatLng | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
   const [countryid, setCountryid] = useState(0);
   const [stateid, setStateid] = useState(0);
   const [cityid, setCityid] = useState(0);
@@ -159,6 +189,49 @@ export default function CreatePage() {
   const onUnmount = React.useCallback(function callback(map:any) {
     setMap(null)
   }, [])
+
+  const [mapError, setMapError] = useState<string | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Function to run when the Google Maps library is ready
+    const onGoogleMapReady = () => {
+      setGoogleLibReady(true);
+    };
+
+    // Try to get user's current location
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setCenter([position.coords.latitude, position.coords.longitude]);
+          setMarkerPosition(L.latLng(position.coords.latitude, position.coords.longitude));
+          setLocationError(null);
+        },
+        (error) => {
+          console.log("위치 정보를 가져올 수 없습니다:", error.message);
+          setLocationError("위치 정보를 가져올 수 없습니다. 지도를 클릭하여 위치를 선택해주세요.");
+          // 기본 위치를 서울로 설정
+          setCenter([37.5665, 126.9780]);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0
+        }
+      );
+    } else {
+      setLocationError("이 브라우저에서는 위치 서비스를 지원하지 않습니다.");
+      // 기본 위치를 서울로 설정
+      setCenter([37.5665, 126.9780]);
+    }
+  }, []);
+
+  // Google Maps 로드 에러 처리
+  const handleLoadError = (error: Error) => {
+    console.log("Google Maps 로드 실패:", error);
+    setMapError("지도를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.");
+  };
+
   // Explicitly setting types for e
   const handleCountryChange = (e: any) => {
     const countryName = e?.name || '';
@@ -313,18 +386,27 @@ export default function CreatePage() {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          setUserLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          });
-          setShowMarker(true);  // Show marker once the location is obtained
+          setCenter([position.coords.latitude, position.coords.longitude]);
+          setMarkerPosition(L.latLng(position.coords.latitude, position.coords.longitude));
+          setLocationError(null);
         },
         (error) => {
-          console.error("Error getting user location:", error);
+          console.log("위치 정보를 가져올 수 없습니다:", error.message);
+          setLocationError("위치 정보를 가져올 수 없습니다. 지도를 클릭하여 위치를 선택해주세요.");
+          // 기본 위치를 서울로 설정
+          setCenter([37.5665, 126.9780]);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0
         }
       );
+    } else {
+      setLocationError("이 브라우저에서는 위치 서비스를 지원하지 않습니다.");
+      // 기본 위치를 서울로 설정
+      setCenter([37.5665, 126.9780]);
     }
-
   }, []);
 
   useEffect(() => {
@@ -348,6 +430,41 @@ export default function CreatePage() {
   }, []);
 
   
+
+  // 위치 찾기 성공 핸들러
+  const handleLocationFound = useCallback((latlng: L.LatLng) => {
+    setMarkerPosition(latlng);
+    setCenter([latlng.lat, latlng.lng]);
+    setFormData(prev => ({
+      ...prev,
+      latitude: latlng.lat.toString(),
+      longitude: latlng.lng.toString(),
+    }));
+    setLocationError(null);
+  }, []);
+
+  // 위치 찾기 실패 핸들러
+  const handleLocationError = useCallback((error: L.ErrorEvent) => {
+    console.log("위치 정보를 가져올 수 없습니다:", error.message);
+    setLocationError("위치 정보를 가져올 수 없습니다. 지도를 클릭하여 위치를 선택해주세요.");
+  }, []);
+
+  // 현재 위치 찾기
+  const findMyLocation = useCallback(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const latlng = L.latLng(position.coords.latitude, position.coords.longitude);
+          handleLocationFound(latlng);
+        },
+        (error) => {
+          handleLocationError({ type: 'locationerror', message: error.message } as L.ErrorEvent);
+        }
+      );
+    } else {
+      setLocationError("이 브라우저에서는 위치 서비스를 지원하지 않습니다.");
+    }
+  }, [handleLocationFound, handleLocationError]);
 
   return (
     <main className="container mx-auto px-4 py-8 bg-gradient-to-b from-slate-100 to-slate-200 min-h-screen">
@@ -405,16 +522,12 @@ export default function CreatePage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   시작일 <span className="text-red-500">*</span>
                 </label>
-                <DatePicker
+                <input
+                  type="date"
                   name="start_date"
-                  selected={new Date(formData.start_date)}
-                  onChange={(date: Date) => {
-                    setFormData({
-                      ...formData,
-                      start_date: format(date, "yyyy-MM-dd"),
-                    });
-                  }}
-                  dateFormat="yyyy-MM-dd"
+                  value={formData.start_date}
+                  onChange={handleChange}
+                  placeholder="시작일을 입력해주세요"
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 />
@@ -423,16 +536,12 @@ export default function CreatePage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   종료일 <span className="text-red-500">*</span>
                 </label>
-                <DatePicker
+                <input
+                  type="date"
                   name="end_date"
-                  selected={new Date(formData.end_date)}
-                  onChange={(date: Date) => {
-                    setFormData({
-                      ...formData,
-                      end_date: format(date, "yyyy-MM-dd"),
-                    });
-                  }}
-                  dateFormat="yyyy-MM-dd"
+                  value={formData.end_date}
+                  onChange={handleChange}
+                  placeholder="종료일을 입력해주세요"
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 />
@@ -503,24 +612,41 @@ export default function CreatePage() {
               </div>
 
               <div className="rounded-lg overflow-hidden border border-gray-300">
-                {isLoaded ? (
-                  <GoogleMap 
-                    mapContainerStyle={{
-                      width: '100%',
-                      height: '300px',
-                    }} 
-                    center={center} 
-                    zoom={8} 
-                    onLoad={onLoad} 
-                    onUnmount={onUnmount}
-                  >
-                    {showMarker && <Marker position={userLocation} />}
-                  </GoogleMap>
-                ) : (
-                  <div className="h-[300px] flex items-center justify-center bg-gray-100">
-                    <p className="text-gray-500">지도를 불러오는 중...</p>
+                {locationError && (
+                  <div className="bg-yellow-50 p-4 rounded-md mb-4">
+                    <p className="text-yellow-700">{locationError}</p>
                   </div>
                 )}
+                <div className="h-[400px] rounded-lg overflow-hidden border border-gray-300">
+                  <MapContainer
+                    center={center}
+                    zoom={zoom}
+                    style={{ height: '100%', width: '100%' }}
+                  >
+                    <TileLayer
+                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                    <MapEvents
+                      onLocationFound={handleLocationFound}
+                      onLocationError={handleLocationError}
+                    />
+                    <ChangeView center={center} zoom={zoom} />
+                    {markerPosition && (
+                      <Marker position={markerPosition} icon={icon} />
+                    )}
+                  </MapContainer>
+                </div>
+                <p className="text-sm text-gray-500">
+                  지도를 클릭하여 정확한 위치를 선택하거나, '내 위치 찾기' 버튼을 눌러주세요.
+                </p>
+                <button
+                  type="button"
+                  onClick={findMyLocation}
+                  className="text-sm text-blue-600 hover:text-blue-500"
+                >
+                  내 위치 찾기
+                </button>
               </div>
             </div>
           </section>
