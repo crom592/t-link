@@ -30,8 +30,9 @@ const containerStyle = {
   width: '400px',
   height: '400px'
 };
-export default function DetailPage({ params }: { params: { id: string } }) {
-  const postId = params.id;
+export default async function DetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const postId = id;
   const [post, setPostData] = useState<Post | null>(null);
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
